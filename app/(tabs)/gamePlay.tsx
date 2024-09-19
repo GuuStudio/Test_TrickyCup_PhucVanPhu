@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, ImageBackground, Image, StyleSheet, TouchableOpacity, Animated, Easing } from "react-native";
+import { View, ImageBackground, Image, TouchableOpacity, Animated, Easing } from "react-native";
 
 
-const GamePlay = () => {
+export default function GamePlayScreen() {
     const [shuffling, setShuffling] = useState<boolean>(true);
     const [selectedCup, setSelectedCup] = useState<number | null>(null);
 
@@ -11,45 +11,43 @@ const GamePlay = () => {
     const [showBall, setShowBall] = useState<boolean>(false);
     const [animationFinished, setAnimationFinished] = useState<boolean>(false);
 
-    const cupAnimations = [new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)];
+    const cupAnimations = useRef(new Animated.Value(0)).current;
     const elevationAnimation = useRef(new Animated.Value(0)).current;
 
     const [gameResult, setGameResult] = useState<string | null>(null);
 
     useEffect(() => {
         if (shuffling) {
-            const rotateAnimations = cupAnimations.map(animation =>
-                Animated.loop(
-                    Animated.sequence([
-                        Animated.timing(animation, {
-                            toValue: 1,
-                            duration: 1500,
-                            easing: Easing.linear,
-                            useNativeDriver: true,
-                        }),
-                        Animated.timing(animation, {
-                            toValue: 0,
-                            duration: 1500,
-                            easing: Easing.linear,
-                            useNativeDriver: true,
-                        })
-                    ])
-                )
-            );
-            const translateXAnimations = cupAnimations.map((animation) =>
+            const rotateAnimations = Animated.loop(
                 Animated.sequence([
-                    Animated.timing(animation, {
+                    Animated.timing(cupAnimations, {
                         toValue: 1,
-                        duration: 3000,
+                        duration: 1500,
                         easing: Easing.linear,
                         useNativeDriver: true,
                     }),
+                    Animated.timing(cupAnimations, {
+                        toValue: 0,
+                        duration: 1500,
+                        easing: Easing.linear,
+                        useNativeDriver: true,
+                    })
                 ])
-            );
+            )
+
+            const translateXAnimations = Animated.sequence([
+                Animated.timing(cupAnimations, {
+                    toValue: 1,
+                    duration: 3000,
+                    easing: Easing.linear,
+                    useNativeDriver: true,
+                }),
+            ])
+
 
             Animated.parallel([
-                ...rotateAnimations,
-                ...translateXAnimations
+                rotateAnimations,
+                translateXAnimations
             ]).start(() => setAnimationFinished(true));
 
             const timerShuffling = setTimeout(() => {
@@ -59,7 +57,8 @@ const GamePlay = () => {
             elevationAnimation.setValue(0);
             return () => {
                 clearTimeout(timerShuffling);
-                cupAnimations.forEach((anim) => anim.stopAnimation());
+                cupAnimations.stopAnimation();
+                cupAnimations.setValue(0);
             };
         }
     }, [shuffling]);
@@ -97,15 +96,14 @@ const GamePlay = () => {
         });
     };
 
-    const rotateAnimation = cupAnimations.map(animation =>
-        animation.interpolate({
-            inputRange: [0, 1],
-            outputRange: ['0deg', '360deg']
-        })
-    );
+    const rotateAnimation = cupAnimations.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '360deg']
+    })
 
-    const translateX = (index: number) => {
-        return cupAnimations[index].interpolate({
+
+    const translateX = () => {
+        return cupAnimations.interpolate({
             inputRange: [0, 1],
             outputRange: [0, -100]
         });
@@ -128,8 +126,8 @@ const GamePlay = () => {
                                 style={
                                     {
                                         transform: [
-                                            { rotate: rotateAnimation[index] },
-                                            { translateX: translateX(index) },
+                                            { rotate: rotateAnimation },
+                                            { translateX: translateX() },
                                             { translateY: selectedCup === index ? cupElevation : 0 },
                                         ]
                                     }
@@ -142,7 +140,7 @@ const GamePlay = () => {
                 {showBall && (
                     <Image
                         source={require('../../assets/images/ball.png')}
-                        className=" absolute bottom-[325px] w-[40px] h-[40px] ml-[45px]"
+                        className=" absolute bottom-[335px] w-[40px] h-[40px] ml-[45px]"
                         style={{ left: `${ballPosition * 33.33}%` }}
                     />
                 )}
@@ -150,14 +148,14 @@ const GamePlay = () => {
                 {gameResult === 'win' && (
                     <Image
                         source={require('../../assets/images/you-win.png')}
-                        className=" absolute top-[360px] w-[337px] h-[132px]"
+                        className=" absolute top-[350px] w-[337px] h-[132px]"
                         resizeMode="contain"
                     />
                 )}
                 {gameResult === 'lose' && (
                     <Image
                         source={require('../../assets/images/you-lose.png')}
-                        className=" absolute top-[360px] w-[337px] h-[132px]"
+                        className=" absolute top-[350px] w-[337px] h-[132px]"
                         resizeMode="contain"
                     />
                 )}
@@ -175,5 +173,4 @@ const GamePlay = () => {
     );
 };
 
-export default GamePlay;
 
