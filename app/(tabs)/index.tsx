@@ -1,8 +1,8 @@
 import { router } from "expo-router";
 import React from "react";
-import { View, Text, Button, ImageBackground, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, ImageBackground, Image, TouchableOpacity } from "react-native";
 
-const Home = () => {
+export default function HomeScreen() {
 
   return (
     <ImageBackground
@@ -25,5 +25,5 @@ const Home = () => {
     </ImageBackground>
   )
 }
-export default Home
+
 
