@@ -1,7 +1,7 @@
 # Welcome to my Stricky Cup game  👋
 ## Review
 
-<img src="https://github.com/user-attachments/assets/d97fc954-c636-4f87-a480-54063e6cf833" alt="Video giới thiệu" width="500"/>
+<img src="https://github.com/user-attachments/assets/e0cc2069-9306-41d0-946a-f76c52677a9c" alt="Video giới thiệu" width="500"/>
 
 ## Get started
 
